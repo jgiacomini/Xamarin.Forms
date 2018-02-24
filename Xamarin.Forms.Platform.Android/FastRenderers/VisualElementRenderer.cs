@@ -14,16 +14,15 @@ namespace Xamarin.Forms.Platform.Android.FastRenderers
 		IVisualElementRenderer _renderer;
 		readonly GestureManager _gestureManager;
 		readonly AutomationPropertiesProvider _automationPropertiesProvider;
-		readonly EffectControlProvider _effectControlProvider;
+		readonly EffectControlProvider _effectControlProvider; 
 
 		public VisualElementRenderer(IVisualElementRenderer renderer)
-		{
+		{ 
 			_renderer = renderer;
 			_renderer.ElementPropertyChanged += OnElementPropertyChanged;
 			_renderer.ElementChanged += OnElementChanged;
 			_gestureManager = new GestureManager(_renderer);
 			_automationPropertiesProvider = new AutomationPropertiesProvider(_renderer);
-
 			_effectControlProvider = new EffectControlProvider(_renderer?.View);
 		}
 
@@ -36,13 +35,6 @@ namespace Xamarin.Forms.Platform.Android.FastRenderers
 			_effectControlProvider.RegisterEffect(effect);
 		}
 
-		public void UpdateBackgroundColor(Color? color = null)
-		{		
-			if (_disposed || Element == null || Control == null)
-				return;
-
-			Control.SetBackgroundColor((color ?? Element.BackgroundColor).ToAndroid());
-		}
 
 		void UpdateFlowDirection()
 		{
@@ -86,6 +78,8 @@ namespace Xamarin.Forms.Platform.Android.FastRenderers
 
 		void OnElementChanged(object sender, VisualElementChangedEventArgs e)
 		{
+			var reference = Guid.NewGuid().ToString();
+			Performance.Start(reference);
 			if (e.OldElement != null)
 			{
 				e.OldElement.PropertyChanged -= OnElementPropertyChanged;
@@ -94,19 +88,34 @@ namespace Xamarin.Forms.Platform.Android.FastRenderers
 			if (e.NewElement != null)
 			{
 				e.NewElement.PropertyChanged += OnElementPropertyChanged;
-				UpdateBackgroundColor();
 				UpdateFlowDirection();
+				UpdateIsEnabled();
 			}
 
 			EffectUtilities.RegisterEffectControlProvider(this, e.OldElement, e.NewElement);
+			Performance.Stop(reference);
+		}
+
+		void UpdateIsEnabled()
+		{
+			if (Element == null || _disposed)
+			{
+				return;
+			}
+
+			Control.Enabled = Element.IsEnabled;
 		}
 
 		void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			if (e.PropertyName == VisualElement.BackgroundColorProperty.PropertyName)
-				UpdateBackgroundColor();
-			else if (e.PropertyName == VisualElement.FlowDirectionProperty.PropertyName)
+			if (e.PropertyName == VisualElement.FlowDirectionProperty.PropertyName)
+			{
 				UpdateFlowDirection();
+			}
+			else if (e.PropertyName == VisualElement.IsEnabledProperty.PropertyName)
+			{
+				UpdateIsEnabled();
+			}
 		}
 	}
 }

@@ -20,7 +20,7 @@ namespace Xamarin.Forms.Platform.Android.FastRenderers
 		readonly MotionEventHelper _motionEventHelper = new MotionEventHelper();
 
 		protected override void Dispose(bool disposing)
-		{
+		{			
 			if (_disposed)
 				return;
 
@@ -63,14 +63,9 @@ namespace Xamarin.Forms.Platform.Android.FastRenderers
 			base.Invalidate();
 		}
 
-		async void OnElementChanged(ElementChangedEventArgs<Image> e)
+		void OnElementChanged(ElementChangedEventArgs<Image> e)
 		{
-			await TryUpdateBitmap(e.OldElement);
-			UpdateAspect();
-			this.EnsureId();
-
-			ElevationHelper.SetElevation(this, e.NewElement);
-
+			this.EnsureId();			  
 			ElementChanged?.Invoke(this, new VisualElementChangedEventArgs(e.OldElement, e.NewElement));
 		}
 
@@ -121,11 +116,15 @@ namespace Xamarin.Forms.Platform.Android.FastRenderers
 			element.PropertyChanged += OnElementPropertyChanged;
 
 			if (_visualElementTracker == null)
+			{
 				_visualElementTracker = new VisualElementTracker(this);
+			}
 
 			if (_visualElementRenderer == null)
 			{
 				_visualElementRenderer = new VisualElementRenderer(this);
+				BackgroundManager.Init(this);
+				ImageElementManagerManager.Init(this);
 			}
 
 			Performance.Stop(reference);
@@ -169,55 +168,9 @@ namespace Xamarin.Forms.Platform.Android.FastRenderers
 		{
 		}
 
-		async void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
+		void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
-			if (e.PropertyName == Image.SourceProperty.PropertyName)
-				await TryUpdateBitmap();
-			else if (e.PropertyName == Image.AspectProperty.PropertyName)
-				UpdateAspect();
-
 			ElementPropertyChanged?.Invoke(this, e);
-		}
-
-		async Task TryUpdateBitmap(Image previous = null)
-		{
-			// By default we'll just catch and log any exceptions thrown by UpdateBitmap so they don't bring down
-			// the application; a custom renderer can override this method and handle exceptions from
-			// UpdateBitmap differently if it wants to
-
-			try
-			{
-				await UpdateBitmap(previous);
-			}
-			catch (Exception ex)
-			{
-				Log.Warning(nameof(ImageRenderer), "Error loading image: {0}", ex);
-			}
-			finally
-			{
-				((IImageController)_element)?.SetIsLoading(false);
-			}
-		}
-
-		async Task UpdateBitmap(Image previous = null)
-		{
-			if (_element == null || _disposed)
-			{
-				return;
-			}
-
-			await Control.UpdateBitmap(_element, previous);
-		}
-
-		void UpdateAspect()
-		{
-			if (_element == null || _disposed)
-			{
-				return;
-			}
-
-			ScaleType type = _element.Aspect.ToScaleType();
-			SetScaleType(type);
 		}
 	}
 }

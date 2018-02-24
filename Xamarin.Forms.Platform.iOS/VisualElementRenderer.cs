@@ -36,8 +36,8 @@ namespace Xamarin.Forms.Platform.MacOS
 		readonly NativeColor _defaultColor = NativeColor.Clear;
 
 		readonly List<EventHandler<VisualElementChangedEventArgs>> _elementChangedHandlers = new List<EventHandler<VisualElementChangedEventArgs>>();
-
 		readonly PropertyChangedEventHandler _propertyChangedHandler;
+
 #if __MOBILE__
 		string _defaultAccessibilityLabel;
 		string _defaultAccessibilityHint;
@@ -129,12 +129,17 @@ namespace Xamarin.Forms.Platform.MacOS
 			remove { _elementChangedHandlers.Remove(value); }
 		}
 
+	
+
 		public virtual SizeRequest GetDesiredSize(double widthConstraint, double heightConstraint)
 		{
 			return NativeView.GetSizeRequest(widthConstraint, heightConstraint);
 		}
 
 		public NativeView NativeView => this;
+		 
+
+		protected internal virtual NativeView GetControl() => NativeView;
 
 		void IVisualElementRenderer.SetElement(VisualElement element)
 		{
@@ -306,6 +311,7 @@ namespace Xamarin.Forms.Platform.MacOS
 			else if (e.PropertyName == AutomationProperties.IsInAccessibleTreeProperty.PropertyName)
 				SetIsAccessibilityElement();
 #endif
+
 		}
 
 		protected virtual void OnRegisterEffect(PlatformEffect effect)

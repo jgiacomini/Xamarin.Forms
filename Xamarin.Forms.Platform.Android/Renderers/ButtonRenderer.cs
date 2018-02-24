@@ -15,7 +15,7 @@ namespace Xamarin.Forms.Platform.Android
 {
 	public class ButtonRenderer : ViewRenderer<Button, AButton>, AView.IOnAttachStateChangeListener
 	{
-		ButtonBackgroundTracker _backgroundTracker;
+		BorderBackgroundTracker _backgroundTracker;
 		TextColorSwitcher _textColorSwitcher;
 		float _defaultFontSize;
 		Typeface _defaultTypeface;
@@ -110,9 +110,7 @@ namespace Xamarin.Forms.Platform.Android
 			}
 
 			if (_backgroundTracker == null)
-				_backgroundTracker = new ButtonBackgroundTracker(Element, Control);
-			else
-				_backgroundTracker.Button = e.NewElement;
+				_backgroundTracker = new BorderBackgroundTracker(this);
 
 			UpdateAll();
 		}
@@ -140,7 +138,7 @@ namespace Xamarin.Forms.Platform.Android
 			if (Element == null || Control == null)
 				return;
 
-			_backgroundTracker?.UpdateBackgroundColor();
+			_backgroundTracker?.UpdateDrawable();
 		}
 
 		void UpdateAll()

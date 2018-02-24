@@ -23,10 +23,14 @@ namespace Xamarin.Forms.Platform.iOS
 		// ReSharper disable once BuiltInTypeReferenceStyle
 		// Under iOS Classic Resharper wants to suggest this use the built-in type ref
 		// but under iOS that suggestion won't work
-		readonly nfloat _minimumButtonHeight = 44; // Apple docs
-		readonly nfloat _defaultCornerRadius = 5;
+		readonly nfloat _minimumButtonHeight = 44; // Apple docs 
 
 		static readonly UIControlState[] s_controlStates = { UIControlState.Normal, UIControlState.Highlighted, UIControlState.Disabled };
+
+		protected ButtonRenderer() : base()
+		{
+			BorderElementManager.Init(this);
+		}
 
 		public override SizeF SizeThatFits(SizeF size)
 		{
@@ -46,6 +50,7 @@ namespace Xamarin.Forms.Platform.iOS
 			{
 				Control.TouchUpInside -= OnButtonTouchUpInside;
 				Control.TouchDown -= OnButtonTouchDown;
+				BorderElementManager.Dispose(this);
 			}
 
 			base.Dispose(disposing);
@@ -76,8 +81,7 @@ namespace Xamarin.Forms.Platform.iOS
 				}
 
 				UpdateText();
-				UpdateFont();
-				UpdateBorder();
+				UpdateFont(); 
 				UpdateImage();
 				UpdateTextColor();
 			}
@@ -97,9 +101,7 @@ namespace Xamarin.Forms.Platform.iOS
 			else if (e.PropertyName == Button.TextColorProperty.PropertyName)
 				UpdateTextColor();
 			else if (e.PropertyName == Button.FontProperty.PropertyName)
-				UpdateFont();
-			else if (e.PropertyName == Button.BorderWidthProperty.PropertyName || e.PropertyName == Button.CornerRadiusProperty.PropertyName || e.PropertyName == Button.BorderColorProperty.PropertyName)
-				UpdateBorder();
+				UpdateFont(); 
 			else if (e.PropertyName == Button.ImageProperty.PropertyName)
 				UpdateImage();
 		}
@@ -131,33 +133,14 @@ namespace Xamarin.Forms.Platform.iOS
 
 		void OnButtonTouchUpInside(object sender, EventArgs eventArgs)
 		{
-			((IButtonController)Element)?.SendReleased();
-			((IButtonController)Element)?.SendClicked();
+			ButtonElementManager.OnButtonTouchUpInside(this.Element);
 		}
 
 		void OnButtonTouchDown(object sender, EventArgs eventArgs)
 		{
-			((IButtonController)Element)?.SendPressed();
+			ButtonElementManager.OnButtonTouchDown(this.Element);
 		}
-
-		void UpdateBorder()
-		{
-			var uiButton = Control;
-			var button = Element;
-
-			if (button.BorderColor != Color.Default)
-				uiButton.Layer.BorderColor = button.BorderColor.ToCGColor();
-
-			uiButton.Layer.BorderWidth = Math.Max(0f, (float)button.BorderWidth);
-
-			nfloat cornerRadius = _defaultCornerRadius;
-
-			if (button.IsSet(Button.CornerRadiusProperty) && button.CornerRadius != (int)Button.CornerRadiusProperty.DefaultValue)
-				cornerRadius = button.CornerRadius;
-
-			uiButton.Layer.CornerRadius = cornerRadius;
-		}
-
+ 
 		void UpdateFont()
 		{
 			Control.TitleLabel.Font = Element.ToUIFont();
@@ -197,7 +180,7 @@ namespace Xamarin.Forms.Platform.iOS
 		}
 
 		void UpdateText()
-		{
+		{			
 			var newText = Element.Text;
 
 			if (Control.Title(UIControlState.Normal) != newText)
