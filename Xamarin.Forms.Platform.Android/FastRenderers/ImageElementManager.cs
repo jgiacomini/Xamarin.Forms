@@ -4,7 +4,7 @@ using Android.Widget;
 
 namespace Xamarin.Forms.Platform.Android.FastRenderers
 {
-	public static class ImageElementManagerManager
+	public static class ImageElementManager
 	{
 		public static void Init(IVisualElementRenderer renderer)
 		{
@@ -16,8 +16,8 @@ namespace Xamarin.Forms.Platform.Android.FastRenderers
 		{
 			var renderer = (sender as IVisualElementRenderer);
 			var view = (ImageView)renderer.View;
-			var newImageElementManager = (IImageViewController)e.NewElement;
-			var oldImageElementManager = (IImageViewController)e.OldElement;
+			var newImageElementManager = (IImageController)e.NewElement;
+			var oldImageElementManager = (IImageController)e.OldElement;
 
 			await TryUpdateBitmap(view, newImageElementManager, oldImageElementManager);
 			UpdateAspect(view, newImageElementManager, oldImageElementManager);
@@ -27,19 +27,19 @@ namespace Xamarin.Forms.Platform.Android.FastRenderers
 		private async static void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			var renderer = (sender as IVisualElementRenderer);
-			var ImageElementManager = (IImageViewController)renderer.Element;
+			var ImageElementManager = (IImageController)renderer.Element;
 			if (e.PropertyName == ImageElementManager.SourceProperty.PropertyName)
 			{ 
-				await TryUpdateBitmap((ImageView)renderer.View, (IImageViewController)renderer.Element);
+				await TryUpdateBitmap((ImageView)renderer.View, (IImageController)renderer.Element);
 			}
 			else if (e.PropertyName == ImageElementManager.AspectProperty.PropertyName)
 			{ 
-				UpdateAspect((ImageView)renderer.View, (IImageViewController)renderer.Element);
+				UpdateAspect((ImageView)renderer.View, (IImageController)renderer.Element);
 			}
 		}
 
 
-		async static Task TryUpdateBitmap(ImageView Control, IImageViewController newImage, IImageViewController previous = null)
+		async static Task TryUpdateBitmap(ImageView Control, IImageController newImage, IImageController previous = null)
 		{
 			if (newImage == null)
 			{
@@ -49,7 +49,7 @@ namespace Xamarin.Forms.Platform.Android.FastRenderers
 			await Control.UpdateBitmap(newImage, previous);
 		}
 
-		static void UpdateAspect(ImageView Control, IImageViewController newImage, IImageViewController previous = null)
+		static void UpdateAspect(ImageView Control, IImageController newImage, IImageController previous = null)
 		{
 			if (newImage == null)
 			{

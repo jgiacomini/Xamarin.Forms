@@ -124,7 +124,7 @@ namespace Xamarin.Forms.Platform.Android.FastRenderers
 			{
 				_visualElementRenderer = new VisualElementRenderer(this);
 				BackgroundManager.Init(this);
-				ImageElementManagerManager.Init(this);
+				ImageElementManager.Init(this);
 			}
 
 			Performance.Stop(reference);

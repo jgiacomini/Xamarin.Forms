@@ -149,7 +149,7 @@ namespace Xamarin.Forms.Platform.Android.FastRenderers
 			if (_tracker == null)
 			{
 				_tracker = new VisualElementTracker(this);
-				ImageElementManagerManager.Init(this);
+				ImageElementManager.Init(this);
 			}
 
 			if (_visualElementRenderer == null)

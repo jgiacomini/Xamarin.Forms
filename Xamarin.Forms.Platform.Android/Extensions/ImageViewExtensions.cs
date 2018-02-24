@@ -11,8 +11,8 @@ namespace Xamarin.Forms.Platform.Android
 		// TODO hartez 2017/04/07 09:33:03 Review this again, not sure it's handling the transition from previousImage to 'null' newImage correctly
 		public static async Task UpdateBitmap(
 			this AImageView imageView,
-			IImageViewController newView,
-			IImageViewController previousView = null)
+			IImageController newView,
+			IImageController previousView = null)
 		{
 			IImageController imageController = null;
 			ImageSource newImageSource = newView?.Source;
